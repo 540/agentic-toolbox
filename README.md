@@ -27,7 +27,7 @@ npx skills add 540/agentic-toolbox
 
 | Hook | Qué hace |
 |------|----------|
-| [no-comments](plugins/no-comments/) | Hook que bloquea los comentarios que el agente añade a ficheros Ruby: el código se explica solo. Exime los pragmas de máquina. |
+| [no-comments-ruby](plugins/no-comments-ruby/) | Hook que bloquea los comentarios que el agente añade a ficheros Ruby: el código se explica solo. Exime los pragmas de máquina. |
 
 ## Licencia
 

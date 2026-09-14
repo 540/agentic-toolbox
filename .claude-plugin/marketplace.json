@@ -28,8 +28,8 @@
       ]
     },
     {
-      "name": "no-comments",
-      "source": "./plugins/no-comments",
+      "name": "no-comments-ruby",
+      "source": "./plugins/no-comments-ruby",
       "description": "Hook PreToolUse que bloquea los comentarios nuevos en ficheros Ruby (.rb/.rake): el código se explica solo. Exime los pragmas de máquina (frozen_string_literal, sorbet, rubocop).",
       "version": "0.1.0",
       "license": "MIT",
