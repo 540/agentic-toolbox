@@ -6,6 +6,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+### Changed
+
+- El plugin `no-comments` pasa a llamarse `no-comments-ruby`: su escáner siempre fue específico de Ruby y el nombre genérico queda libre para la versión agnóstica al lenguaje. Quien lo tuviera instalado debe reinstalarlo con el nombre nuevo.
+
 ## [0.2.0] - 2026-09-01
 
 ### Added

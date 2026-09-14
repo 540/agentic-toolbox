@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/usr/bin/ruby ${CLAUDE_PLUGIN_ROOT}/hooks/no-comments.rb"
+            "command": "/usr/bin/ruby ${CLAUDE_PLUGIN_ROOT}/hooks/no-comments-ruby.rb"
           }
         ]
       }

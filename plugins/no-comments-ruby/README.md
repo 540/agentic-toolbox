@@ -1,4 +1,4 @@
-# no-comments
+# no-comments-ruby
 
 Parte de [540 Agentic Toolbox](https://github.com/540/agentic-toolbox).
 
@@ -19,12 +19,12 @@ Cuando bloquea, el mensaje de deny instruye al agente: reemite el edit sin comen
 
 ```
 /plugin marketplace add 540/agentic-toolbox
-/plugin install no-comments@540
+/plugin install no-comments-ruby@540
 ```
 
 Requiere `/usr/bin/ruby` (el Ruby del sistema, presente en macOS y en la mayoría de Linux). Sin gemas: solo stdlib.
 
 ## Adaptarlo
 
-- ¿Otro lenguaje? El escáner de `hooks/no-comments.rb` es específico de Ruby. La estructura (deny sobre lo añadido, pragmas exentos, fail-open) es reutilizable.
+- ¿Otro lenguaje? El escáner de `hooks/no-comments-ruby.rb` es específico de Ruby. La estructura (deny sobre lo añadido, pragmas exentos, fail-open) es reutilizable.
 - ¿Otra política? El mensaje de deny vive al final del script; ajústalo a la convención de tu equipo.
