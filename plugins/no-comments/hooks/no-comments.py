@@ -152,7 +152,7 @@ def edits_from(payload):
     return path, []
 
 
-NOISE = "Este código no lleva comentarios explicativos: el objetivo es cero. El código dice lo que hace, y un comentario que lo repite caduca en cuanto uno de los dos cambia. Reemite el edit sin ellos. Cuando un bloque parece pedir un comentario que lo narre, es un problema de naming: extráelo a una función o método con buen nombre y deja que el nombre cargue el significado. Las referencias a tickets van en el mensaje de commit y en la PR. Si la excepción se repite en este proyecto, su sitio es el .no-comments.json de la raíz, no el código. Y si crees que un comentario concreto es imprescindible porque nombra una restricción que el código de verdad no puede expresar (un quirk de un sistema externo, una optimización que obliga a escribirlo de forma poco idiomática), reemítelo con el marcador «no-comments: <razón>» y será el usuario quien decida si entra. La razón tiene que nombrar la restricción, no repetir lo que hace el código."
+NOISE = "Este código no lleva comentarios explicativos: el objetivo es cero. El código dice lo que hace, y un comentario que lo repite caduca en cuanto uno de los dos cambia. Reemite el edit sin ellos. Cuando un bloque parece pedir un comentario que lo narre, es un problema de naming: extráelo a una función o método con buen nombre y deja que el nombre cargue el significado. Las referencias a tickets van en el mensaje de commit y en la PR. Si la excepción se repite en este proyecto, su sitio es el .no-comments.json de la raíz, no el código. Y si crees que un comentario concreto es imprescindible porque nombra una restricción que el código de verdad no puede expresar (un quirk de un sistema externo, una optimización que obliga a escribirlo de forma poco idiomática), reemítelo con el marcador delante del propio comentario, en la misma línea: «no-comments: <razón>». Esa línea es la que se queda en el código, así que la razón ES el comentario, no una nota aparte. Nombra la restricción, no repitas lo que hace el código. Si el comentario no cabe en una línea, basta con que el marcador vaya en la primera. Decidirá el usuario."
 
 APPROVAL = "Apruébalo si la razón nombra una restricción que el código no puede expresar por sí solo. Recházalo si solo describe lo que el código ya dice."
 
@@ -171,23 +171,22 @@ def respond(decision, reason):
     )
 
 
-def listing(items):
-    shown = "\n".join(f"  {item}" for item in items[:3])
-    more = f"\n  (+{len(items) - 3} más)" if len(items) > 3 else ""
+def listing(items, cap=3):
+    shown = "\n".join(f"  {item}" for item in items[:cap])
+    more = f"\n  (+{len(items) - cap} más)" if len(items) > cap else ""
     return shown + more
 
 
 def decide(path, comments):
     name = os.path.basename(path)
     plural = "s" if len(comments) > 1 else ""
-    justifications = [MARKER.search(c) for c in comments]
-    if all(justifications):
-        reasons = [m.group(1).strip() for m in justifications]
-        attribution = "cada uno con su justificación" if plural else "con esta justificación"
+    reasons = [m.group(1).strip() for m in (MARKER.search(c) for c in comments) if m]
+    if reasons:
         return respond(
             "ask",
-            f"El agente quiere añadir {len(comments)} comentario{plural} a {name}, "
-            f"{attribution}:\n{listing(reasons)}\n" + APPROVAL,
+            f"El agente quiere añadir {len(comments)} comentario{plural} a {name}:\n"
+            f"{listing(comments, cap=8)}\n"
+            f"Lo justifica así:\n{listing(reasons)}\n" + APPROVAL,
         )
     return respond(
         "deny",

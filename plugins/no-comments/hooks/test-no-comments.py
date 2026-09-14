@@ -191,7 +191,22 @@ marked("comentario justificado pregunta al usuario", "ask", f"{MARK}\nx = 1")
 marked("comentario sin marcador deniega", "deny", "# desenrolla el bucle\nx = 1")
 marked("marcador sin razón deniega", "deny", "# no-comments:\nx = 1")
 marked("marcador con razón en blanco deniega", "deny", "# no-comments:   \nx = 1")
-marked("un justificado y uno suelto deniega", "deny", f"{MARK}\n# y de paso esto\nx = 1")
+marked("un justificado arrastra al bloque", "ask", f"{MARK}\n# y de paso esto\nx = 1")
+
+BLOQUE = (
+    "// no-comments: nombra un comportamiento de @sentry/nextjs que no se ve desde este\n"
+    "// fichero: si no le das nombre al release, el SDK inyecta el build id de Next.\n"
+    "// @sentry/nextjs defaults the release to the Next.js build id, a random value.\n"
+)
+marked("bloque multilínea con el marcador en la primera", "ask", BLOQUE + "x = 1", path="/x/next.config.js")
+marked("bloque multilínea sin marcador", "deny", BLOQUE.replace("no-comments: ", "") + "x = 1", path="/x/next.config.js")
+
+colado = reason("/x/a.py", f"{MARK}\n# y de paso esto\nx = 1")
+check(
+    "el prompt enseña también el comentario sin marcador",
+    True,
+    "y de paso esto" in colado,
+)
 marked("dos justificados preguntan", "ask", f"{MARK}\n# no-comments: el orden importa, la API los exige así\nx = 1")
 for mode in ["default", "plan", "acceptEdits", "auto", "dontAsk", "bypassPermissions"]:
     marked(f"el modo {mode} no cambia la decisión", "ask", f"{MARK}\nx = 1", mode=mode)

@@ -36,11 +36,11 @@ Un comentario suelto se puede ganar su sitio: una función escrita de forma poco
 # no-comments: bucle desenrollado a mano, la versión idiomática cuesta 40ms por request
 ```
 
-Entonces el hook no deniega: devuelve `ask`, y Claude Code te lanza el prompt de permiso. La razón la lees en el propio diff que te enseña el prompt, porque va en la línea que se añade. El agente no puede autoconcederse la excepción, que es la diferencia con los `eslint-disable` de toda la vida.
+El marcador va delante del propio comentario, en la misma línea: esa línea es la que se queda en el código, así que la razón *es* el comentario y no una nota aparte. Entonces el hook no deniega: devuelve `ask`, y Claude Code te lanza el prompt de permiso. La razón la lees en el propio diff que te enseña el prompt, porque va en la línea que se añade. El agente no puede autoconcederse la excepción, que es la diferencia con los `eslint-disable` de toda la vida.
 
 Lo que queda en el código es mejor que el comentario que se habría escrito sin el marcador: la razón tiene que nombrar la restricción, no repetir lo que hace el código. Y todas las excepciones vivas del repo se listan con un `grep -rn "no-comments:"`.
 
-Si un solo comentario del edit va sin marcador, el hook deniega el edit entero.
+El marcador marca el edit, no la línea: basta con que vaya en la primera línea del comentario, y así un comentario de varias líneas también pasa. A cambio, el prompt te enseña **todos** los comentarios que entran con ese edit, no solo los que llevan marcador, para que veas si se ha colado alguno de paso.
 
 El marcador escala a `ask` en cualquier modo de permiso. Está comprobado en sesión interactiva sobre los seis (`default`, `plan`, `acceptEdits`, `auto`, `dontAsk`, `bypassPermissions`): el `ask` de un hook se impone sobre la auto-aprobación del modo y el prompt aparece siempre, incluso en `bypassPermissions`. En headless (`claude -p`) no hay a quién preguntar y el edit se bloquea, que es el comportamiento correcto en CI.
 
