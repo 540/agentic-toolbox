@@ -227,27 +227,7 @@ message = reason("/x/servicio.py", "# uno\n# dos\n# tres\n# cuatro\nx = 1")
 for fragment in ["servicio.py", "4 comentarios", "(+1 más)", "problema de naming", "commit", "no-comments: <razón>", ".no-comments.json"]:
     check(f"el mensaje de deny menciona «{fragment}»", True, fragment in message)
 
-def shell(label, expected, command, cwd=None):
-    check(label, expected, decision("Bash", cwd=cwd, command=command))
-
-
-shell("heredoc de python que reescribe un fichero", "deny", "python3 - <<'PY'\npathlib.Path('src/app.ts').write_text(x)\nPY")
-shell("redirección a un fichero de código", "deny", "cat > src/app.ts <<'EOF'\nconst a = 1\nEOF")
-shell("append a un fichero de código", "deny", "echo 'const a = 1' >> src/app.ts")
-shell("sed in-place", "deny", "sed -i '' 's/a/b/' next.config.js")
-shell("tee a un fichero de código", "deny", "echo x | tee src/app.rb")
-shell("perl in-place", "deny", "perl -pi -e 's/a/b/' lib/cosa.py")
-
-shell("leer no escribe", "allow", "cat src/app.ts | head -20")
-shell("grep en código", "allow", "grep -rn 'sentry' src/*.ts")
-shell("redirección a un log con código en el comando", "allow", "npm run build > build.log 2>&1 && cat src/app.ts")
-shell("redirección a un fichero que no es código", "allow", "git diff > /Users/x/parche.diff")
-shell("formateador que reescribe", "allow", "npx prettier --write src/app.ts")
-shell("tests", "allow", "pytest -q tests/test_cosa.py")
-shell("escritura en scratchpad", "allow", "cat > /tmp/borrador.py <<'EOF'\nx = 1\nEOF")
-shell("comando sin ficheros", "allow", "echo # hola")
-
-check("herramienta ajena", False, run("Read", file_path="/x/a.py"))
+check("herramienta ajena", False, run("Bash", command="echo # hola"))
 check("payload incompleto", False, run("Edit", file_path="/x/a.py"))
 check("payload sin file_path", False, run("Edit", old_string="a", new_string="b  # n"))
 

@@ -29,14 +29,6 @@ EXEMPT = re.compile(
 
 MARKER = re.compile(r"\bno-comments:\s*(\S.*)", re.IGNORECASE)
 
-REDIRECT = re.compile(r">>?\s*['\"]?([\w./~-]+\.[A-Za-z0-9]+)")
-TEE = re.compile(r"\btee\b(?:\s+-\S+)*\s+['\"]?([\w./~-]+\.[A-Za-z0-9]+)")
-INPLACE = re.compile(r"\b(?:sed|perl)\s+(?:-\S+\s+)*-\S*i\S*\s")
-PYWRITE = re.compile(r"\bwrite_text\s*\(|\bopen\s*\([^)]*['\"][wa]|\bwritelines\s*\(")
-PATH_TOKEN = re.compile(r"[\w./~-]+\.[A-Za-z0-9]+")
-
-SHELL_WRITE = "SHELL_WRITE: este comando escribe en %s desde la shell. Escribe código con Edit o Write: el guardarraíl de comentarios solo mira esas herramientas, así que por aquí se lo salta, y un comentario que entre por shell entra sin que nadie lo apruebe. Si el comando hace otra cosa (mover, formatear, generar), reformúlalo para que no reescriba un fichero de código fuente."
-
 STRINGS = re.compile(r"""("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)""")
 
 
@@ -82,15 +74,6 @@ def out_of_scope(path, ignore):
         fnmatch.fnmatch(path, pattern) or fnmatch.fnmatch(path, f"*/{pattern}")
         for pattern in ignore
     )
-
-
-def code_target(command):
-    adjacent = [m.group(1) for pattern in (REDIRECT, TEE) for m in pattern.finditer(command)]
-    anywhere = PATH_TOKEN.findall(command) if (INPLACE.search(command) or PYWRITE.search(command)) else []
-    for token in adjacent + anywhere:
-        if syntax_for(token):
-            return token
-    return None
 
 
 def strip_strings(line):
@@ -212,20 +195,8 @@ def decide(path, comments):
     )
 
 
-def guard_bash(payload):
-    target = code_target(payload.get("tool_input", {}).get("command", ""))
-    if not target:
-        return
-    ignore, _ = load_config()
-    if out_of_scope(target, ignore):
-        return
-    respond("deny", SHELL_WRITE % target)
-
-
 def main():
     payload = json.load(sys.stdin)
-    if payload.get("tool_name") == "Bash":
-        return guard_bash(payload)
     path, edits = edits_from(payload)
     if not path or not edits:
         return
