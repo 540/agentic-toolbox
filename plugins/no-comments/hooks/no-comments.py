@@ -28,7 +28,6 @@ EXEMPT = re.compile(
 )
 
 MARKER = re.compile(r"\bno-comments:\s*(\S.*)", re.IGNORECASE)
-ASKABLE_MODES = {"default", "plan", "acceptEdits"}
 
 STRINGS = re.compile(r"""("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)""")
 
@@ -155,8 +154,6 @@ def edits_from(payload):
 
 NOISE = "Este código no lleva comentarios explicativos: el objetivo es cero. El código dice lo que hace, y un comentario que lo repite caduca en cuanto uno de los dos cambia. Reemite el edit sin ellos. Cuando un bloque parece pedir un comentario que lo narre, es un problema de naming: extráelo a una función o método con buen nombre y deja que el nombre cargue el significado. Las referencias a tickets van en el mensaje de commit y en la PR. Si la excepción se repite en este proyecto, su sitio es el .no-comments.json de la raíz, no el código. Y si crees que un comentario concreto es imprescindible porque nombra una restricción que el código de verdad no puede expresar (un quirk de un sistema externo, una optimización que obliga a escribirlo de forma poco idiomática), reemítelo con el marcador «no-comments: <razón>» y será el usuario quien decida si entra. La razón tiene que nombrar la restricción, no repetir lo que hace el código."
 
-UNASKABLE = "Los comentarios llevan marcador de justificación, pero esta sesión corre en modo %s, donde el marcador no llega al usuario. Un marcador no se aprueba solo. Reemite el edit sin ellos, o pide al usuario que escriba él esa línea."
-
 APPROVAL = "Apruébalo si la razón nombra una restricción que el código no puede expresar por sí solo. Recházalo si solo describe lo que el código ya dice."
 
 
@@ -180,20 +177,18 @@ def listing(items):
     return shown + more
 
 
-def decide(path, comments, mode):
+def decide(path, comments):
     name = os.path.basename(path)
     plural = "s" if len(comments) > 1 else ""
     justifications = [MARKER.search(c) for c in comments]
     if all(justifications):
         reasons = [m.group(1).strip() for m in justifications]
         attribution = "cada uno con su justificación" if plural else "con esta justificación"
-        header = (
-            f"el agente quiere añadir {len(comments)} comentario{plural} a {name}, "
-            f"{attribution}:\n{listing(reasons)}\n"
+        return respond(
+            "ask",
+            f"El agente quiere añadir {len(comments)} comentario{plural} a {name}, "
+            f"{attribution}:\n{listing(reasons)}\n" + APPROVAL,
         )
-        if mode in ASKABLE_MODES:
-            return respond("ask", header[0].upper() + header[1:] + APPROVAL)
-        return respond("deny", f"COMMENT_UNAPPROVED: {header}" + UNASKABLE % mode)
     return respond(
         "deny",
         f"COMMENT_NOISE: este cambio añade {len(comments)} comentario{plural} "
@@ -216,7 +211,7 @@ def main():
     for old, new in edits:
         comments.extend(added_comments(old, new, syntax, allow))
     if comments:
-        decide(path, comments, payload.get("permission_mode", "default"))
+        decide(path, comments)
 
 
 if __name__ == "__main__":

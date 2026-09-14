@@ -42,11 +42,7 @@ Lo que queda en el código es mejor que el comentario que se habría escrito sin
 
 Si un solo comentario del edit va sin marcador, el hook deniega el edit entero.
 
-**El marcador solo escala a `ask` en los modos donde está comprobado que el prompt llega al usuario**: `default`, `plan` y `acceptEdits`. En `auto`, `dontAsk` y `bypassPermissions` deniega y lo explica en el mensaje.
-
-No es una decisión de diseño sino de evidencia: la documentación de hooks no dice qué hace un `ask` en los modos que no preguntan, y un marcador que se aprueba solo no vale nada. `acceptEdits` está dentro porque se verificó en sesión interactiva que el prompt aparece, pese a ser un modo que existe precisamente para no preguntar en edits. Los tres restantes están fuera hasta que alguien los verifique igual; abrirlos es una línea en `ASKABLE_MODES` y su test.
-
-En los modos que deniegan, la salida es escribir la línea a mano o declarar la excepción en la configuración del proyecto.
+El marcador escala a `ask` en cualquier modo de permiso. Está comprobado en sesión interactiva sobre los seis (`default`, `plan`, `acceptEdits`, `auto`, `dontAsk`, `bypassPermissions`): el `ask` de un hook se impone sobre la auto-aprobación del modo y el prompt aparece siempre, incluso en `bypassPermissions`. En headless (`claude -p`) no hay a quién preguntar y el edit se bloquea, que es el comportamiento correcto en CI.
 
 ## Excepciones por proyecto
 
