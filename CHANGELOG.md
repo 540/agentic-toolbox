@@ -6,6 +6,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+### Added
+
+- Plugin `no-comments` (nuevo, 0.1.0): configuración opcional por proyecto en `.no-comments.json`, con `ignore` (globs de rutas exentas) y `allow` (regex de comentarios permitidos).
+- Plugin `no-comments` (nuevo, 0.1.0): versión agnóstica al lenguaje del hook. Deduce la sintaxis de comentario de la extensión (familias `#`, `//`, `--`, `<!-- -->`) y deja pasar lo que no reconoce.
+
 ### Changed
 
 - El plugin `no-comments` pasa a llamarse `no-comments-ruby`: su escáner siempre fue específico de Ruby y el nombre genérico queda libre para la versión agnóstica al lenguaje. Quien lo tuviera instalado debe reinstalarlo con el nombre nuevo.
