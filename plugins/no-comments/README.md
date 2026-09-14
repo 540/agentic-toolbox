@@ -17,7 +17,7 @@ Es la versión agnóstica al lenguaje de [no-comments-ruby](../no-comments-ruby/
 - Ignora los scratchpads (`/tmp/`, `/private/tmp/`) y todo lo que viva bajo `.claude/`: la configuración del propio agente queda fuera de la regla.
 - Fail-open: ante cualquier error inesperado, deja pasar. Es un guardarraíl de flujo, no una frontera de seguridad.
 
-Cuando bloquea, el mensaje de deny instruye al agente: reemite el edit sin comentarios, o extrae una función con buen nombre. Si un comentario es de verdad imprescindible (un quirk de un sistema externo), el agente debe parar y pedir al usuario que apruebe esa línea.
+Cuando bloquea, el mensaje de deny instruye al agente: reemite el edit sin comentarios, o extrae una función con buen nombre. Si un comentario es de verdad imprescindible, el camino es el marcador de la sección siguiente.
 
 ## Instalación
 
@@ -27,6 +27,22 @@ Cuando bloquea, el mensaje de deny instruye al agente: reemite el edit sin comen
 ```
 
 Requiere `python3` en el `PATH` (3.x, cualquier versión reciente). Sin dependencias: solo stdlib.
+
+## La excepción puntual: el marcador
+
+Un comentario suelto se puede ganar su sitio: una función escrita de forma poco idiomática por un motivo de cómputo, un quirk de un sistema externo. Para eso el agente reemite el comentario con un marcador y una razón:
+
+```python
+# no-comments: bucle desenrollado a mano, la versión idiomática cuesta 40ms por request
+```
+
+Entonces el hook no deniega: devuelve `ask`, y Claude Code te lanza el prompt de permiso con la razón delante para que decides tú. El agente no puede autoconcederse la excepción, que es la diferencia con los `eslint-disable` de toda la vida.
+
+Lo que queda en el código es mejor que el comentario que se habría escrito sin el marcador: la razón tiene que nombrar la restricción, no repetir lo que hace el código. Y todas las excepciones vivas del repo se listan con un `grep -rn "no-comments:"`.
+
+Si un solo comentario del edit va sin marcador, el hook deniega el edit entero.
+
+**El marcador solo pregunta en los modos de permiso que preguntan** (`default` y `plan`). En `acceptEdits`, `auto`, `dontAsk` y `bypassPermissions` deniega y te lo dice, porque la documentación de hooks no garantiza que un `ask` llegue al usuario en esos modos y un marcador no debe aprobarse solo. Ahí la salida es escribir la línea a mano, o declarar la excepción en la configuración del proyecto.
 
 ## Excepciones por proyecto
 
