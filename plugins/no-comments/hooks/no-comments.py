@@ -28,7 +28,7 @@ EXEMPT = re.compile(
 )
 
 MARKER = re.compile(r"\bno-comments:\s*(\S.*)", re.IGNORECASE)
-ASKABLE_MODES = {"default", "plan"}
+ASKABLE_MODES = {"default", "plan", "acceptEdits"}
 
 STRINGS = re.compile(r"""("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)""")
 

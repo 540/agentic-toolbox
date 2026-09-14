@@ -194,7 +194,7 @@ marked("marcador con razón en blanco deniega", "deny", "# no-comments:   \nx = 
 marked("un justificado y uno suelto deniega", "deny", f"{MARK}\n# y de paso esto\nx = 1")
 marked("dos justificados preguntan", "ask", f"{MARK}\n# no-comments: el orden importa, la API los exige así\nx = 1")
 marked("marcador en plan pregunta", "ask", f"{MARK}\nx = 1", mode="plan")
-marked("marcador en acceptEdits deniega", "deny", f"{MARK}\nx = 1", mode="acceptEdits")
+marked("marcador en acceptEdits pregunta", "ask", f"{MARK}\nx = 1", mode="acceptEdits")
 marked("marcador en bypassPermissions deniega", "deny", f"{MARK}\nx = 1", mode="bypassPermissions")
 marked("marcador en dontAsk deniega", "deny", f"{MARK}\nx = 1", mode="dontAsk")
 marked("marcador en auto deniega", "deny", f"{MARK}\nx = 1", mode="auto")

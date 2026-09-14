@@ -36,13 +36,17 @@ Un comentario suelto se puede ganar su sitio: una función escrita de forma poco
 # no-comments: bucle desenrollado a mano, la versión idiomática cuesta 40ms por request
 ```
 
-Entonces el hook no deniega: devuelve `ask`, y Claude Code te lanza el prompt de permiso con la razón delante para que decides tú. El agente no puede autoconcederse la excepción, que es la diferencia con los `eslint-disable` de toda la vida.
+Entonces el hook no deniega: devuelve `ask`, y Claude Code te lanza el prompt de permiso. La razón la lees en el propio diff que te enseña el prompt, porque va en la línea que se añade. El agente no puede autoconcederse la excepción, que es la diferencia con los `eslint-disable` de toda la vida.
 
 Lo que queda en el código es mejor que el comentario que se habría escrito sin el marcador: la razón tiene que nombrar la restricción, no repetir lo que hace el código. Y todas las excepciones vivas del repo se listan con un `grep -rn "no-comments:"`.
 
 Si un solo comentario del edit va sin marcador, el hook deniega el edit entero.
 
-**El marcador solo pregunta en los modos de permiso que preguntan** (`default` y `plan`). En `acceptEdits`, `auto`, `dontAsk` y `bypassPermissions` deniega y te lo dice, porque la documentación de hooks no garantiza que un `ask` llegue al usuario en esos modos y un marcador no debe aprobarse solo. Ahí la salida es escribir la línea a mano, o declarar la excepción en la configuración del proyecto.
+**El marcador solo escala a `ask` en los modos donde está comprobado que el prompt llega al usuario**: `default`, `plan` y `acceptEdits`. En `auto`, `dontAsk` y `bypassPermissions` deniega y lo explica en el mensaje.
+
+No es una decisión de diseño sino de evidencia: la documentación de hooks no dice qué hace un `ask` en los modos que no preguntan, y un marcador que se aprueba solo no vale nada. `acceptEdits` está dentro porque se verificó en sesión interactiva que el prompt aparece, pese a ser un modo que existe precisamente para no preguntar en edits. Los tres restantes están fuera hasta que alguien los verifique igual; abrirlos es una línea en `ASKABLE_MODES` y su test.
+
+En los modos que deniegan, la salida es escribir la línea a mano o declarar la excepción en la configuración del proyecto.
 
 ## Excepciones por proyecto
 
