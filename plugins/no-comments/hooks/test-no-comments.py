@@ -10,22 +10,34 @@ HOOK = Path(__file__).with_name("no-comments.py")
 failures = []
 
 
-def run(tool, cwd=None, **tool_input):
-    payload = json.dumps({"tool_name": tool, "tool_input": tool_input})
+def decision(tool, cwd=None, mode="default", **tool_input):
+    payload = json.dumps({"tool_name": tool, "tool_input": tool_input, "permission_mode": mode})
     result = subprocess.run(
         [sys.executable, str(HOOK)], input=payload, capture_output=True, text=True, cwd=cwd
     )
     if result.returncode != 0:
         failures.append(f"el hook salió con {result.returncode}: {result.stderr.strip()}")
-        return False
-    return "deny" in result.stdout
+        return "error"
+    if not result.stdout.strip():
+        return "allow"
+    return json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"]
+
+
+def run(tool, cwd=None, **tool_input):
+    return decision(tool, cwd=cwd, **tool_input) == "deny"
+
+
+def as_text(value):
+    if value is True:
+        return "deny"
+    if value is False:
+        return "allow"
+    return value
 
 
 def check(label, expected, actual):
     if actual != expected:
-        want = "deny" if expected else "allow"
-        got = "deny" if actual else "allow"
-        failures.append(f"{label}: esperaba {want}, obtuvo {got}")
+        failures.append(f"{label}: esperaba {as_text(expected)}, obtuvo {as_text(actual)}")
 
 
 def denies(label, path, old, new):
@@ -165,8 +177,54 @@ def reason(path, new):
     return json.loads(out.stdout)["hookSpecificOutput"]["permissionDecisionReason"]
 
 
+def marked(label, expected, new, mode="default", path="/x/a.py"):
+    check(
+        label,
+        expected,
+        decision("Edit", mode=mode, file_path=path, old_string="x = 1", new_string=new),
+    )
+
+
+MARK = "# no-comments: bucle desenrollado a mano, la versión idiomática cuesta 40ms por request"
+
+marked("comentario justificado pregunta al usuario", "ask", f"{MARK}\nx = 1")
+marked("comentario sin marcador deniega", "deny", "# desenrolla el bucle\nx = 1")
+marked("marcador sin razón deniega", "deny", "# no-comments:\nx = 1")
+marked("marcador con razón en blanco deniega", "deny", "# no-comments:   \nx = 1")
+marked("un justificado arrastra al bloque", "ask", f"{MARK}\n# y de paso esto\nx = 1")
+
+BLOQUE = (
+    "// no-comments: nombra un comportamiento de @sentry/nextjs que no se ve desde este\n"
+    "// fichero: si no le das nombre al release, el SDK inyecta el build id de Next.\n"
+    "// @sentry/nextjs defaults the release to the Next.js build id, a random value.\n"
+)
+marked("bloque multilínea con el marcador en la primera", "ask", BLOQUE + "x = 1", path="/x/next.config.js")
+marked("bloque multilínea sin marcador", "deny", BLOQUE.replace("no-comments: ", "") + "x = 1", path="/x/next.config.js")
+
+colado = reason("/x/a.py", f"{MARK}\n# y de paso esto\nx = 1")
+check(
+    "el prompt enseña también el comentario sin marcador",
+    True,
+    "y de paso esto" in colado,
+)
+marked("dos justificados preguntan", "ask", f"{MARK}\n# no-comments: el orden importa, la API los exige así\nx = 1")
+for mode in ["default", "plan", "acceptEdits", "auto", "dontAsk", "bypassPermissions"]:
+    marked(f"el modo {mode} no cambia la decisión", "ask", f"{MARK}\nx = 1", mode=mode)
+marked("marcador en // también pregunta", "ask", "// no-comments: el orden lo exige la API", path="/x/a.ts")
+marked("marcador // en fichero python no es comentario", "allow", "// no-comments: el orden lo exige la API")
+
+justified = reason("/x/a.py", f"{MARK}\nx = 1")
+for fragment in ["40ms por request", "Apruébalo si"]:
+    check(f"el prompt de aprobación menciona «{fragment}»", True, fragment in justified)
+check(
+    "el prompt de aprobación no repite el sermón del deny",
+    False,
+    "el objetivo es cero" in justified,
+)
+
+
 message = reason("/x/servicio.py", "# uno\n# dos\n# tres\n# cuatro\nx = 1")
-for fragment in ["servicio.py", "4 comentarios", "(+1 más)", "problema de naming", "commit", "apruebe esa línea", ".no-comments.json"]:
+for fragment in ["servicio.py", "4 comentarios", "(+1 más)", "problema de naming", "commit", "no-comments: <razón>", ".no-comments.json"]:
     check(f"el mensaje de deny menciona «{fragment}»", True, fragment in message)
 
 check("herramienta ajena", False, run("Bash", command="echo # hola"))
