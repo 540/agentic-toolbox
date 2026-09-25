@@ -10,6 +10,8 @@ description: >-
   releases de otros repos.
 user-invocable: true
 allowed-tools: Read, Edit, Bash, AskUserQuestion
+metadata:
+  internal: true
 ---
 
 # Release del marketplace 540/agentic-toolbox
