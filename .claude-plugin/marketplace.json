@@ -6,8 +6,7 @@
   },
   "description": "Skills, hooks y recursos que 540 comparte de su trabajo real con agentes",
   "metadata": {
-    "version": "0.2.0",
-    "pluginRoot": "./plugins"
+    "version": "0.2.0"
   },
   "plugins": [
     {
