@@ -1,0 +1,12 @@
+{
+  "name": "no-comments",
+  "description": "Hook PreToolUse que bloquea los comentarios nuevos que el agente añade al código, en cualquier lenguaje: el código se explica solo. Exime los pragmas de máquina (noqa, eslint-disable, @ts-, shellcheck, licencias).",
+  "version": "0.1.0",
+  "author": {
+    "name": "540",
+    "url": "https://540deg.com"
+  },
+  "repository": "https://github.com/540/agentic-toolbox",
+  "license": "MIT",
+  "hooks": "./hooks/hooks.json"
+}
