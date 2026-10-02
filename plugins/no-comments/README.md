@@ -15,9 +15,10 @@ Es la versión agnóstica al lenguaje de [no-comments-ruby](../no-comments-ruby/
 - Antes de buscar el marcador de comentario descarta el contenido de los strings, para que un `#` dentro de una URL o un `//` dentro de un literal no se lean como comentario.
 - No mira ficheros de datos ni documentación: Markdown, JSON, `.txt`, `.csv`, `.log`, `.svg`, lockfiles, snapshots y cualquier `.env*`. Tampoco entra en `docs/`, `doc/`, `node_modules/` ni `vendor/`.
 - Ignora los scratchpads (`/tmp/`, `/private/tmp/`) y todo lo que viva bajo `.claude/`: la configuración del propio agente queda fuera de la regla.
+- Solo vigila `Write`, `Edit` y `MultiEdit`. Un agente que escriba con `sed -i`, un heredoc o `python -c` se lo salta, y ocurre: tras un deny, un agente tiende a buscar la salida por la shell. Se probó a denegar también los comandos que reescriben código y sale peor el remedio — distinguir un comando que escribe de uno que solo menciona una escritura exige parsear shell, y los falsos positivos bloquean trabajo legítimo. La cobertura real está en revisar el diff.
 - Fail-open: ante cualquier error inesperado, deja pasar. Es un guardarraíl de flujo, no una frontera de seguridad.
 
-Cuando bloquea, el mensaje de deny instruye al agente: reemite el edit sin comentarios, o extrae una función con buen nombre. Si un comentario es de verdad imprescindible (un quirk de un sistema externo), el agente debe parar y pedir al usuario que apruebe esa línea.
+Cuando bloquea, el mensaje de deny instruye al agente: reemite el edit sin comentarios, o extrae una función con buen nombre. Si un comentario es de verdad imprescindible, el camino es el marcador de la sección siguiente.
 
 ## Instalación
 
@@ -27,6 +28,22 @@ Cuando bloquea, el mensaje de deny instruye al agente: reemite el edit sin comen
 ```
 
 Requiere `python3` en el `PATH` (3.x, cualquier versión reciente). Sin dependencias: solo stdlib.
+
+## La excepción puntual: el marcador
+
+Un comentario suelto se puede ganar su sitio: una función escrita de forma poco idiomática por un motivo de cómputo, un quirk de un sistema externo. Para eso el agente reemite el comentario con un marcador y una razón:
+
+```python
+# no-comments: bucle desenrollado a mano, la versión idiomática cuesta 40ms por request
+```
+
+El marcador va delante del propio comentario, en la misma línea: esa línea es la que se queda en el código, así que la razón *es* el comentario y no una nota aparte. Entonces el hook no deniega: devuelve `ask`, y Claude Code te lanza el prompt de permiso. La razón la lees en el propio diff que te enseña el prompt, porque va en la línea que se añade. El agente no puede autoconcederse la excepción, que es la diferencia con los `eslint-disable` de toda la vida.
+
+Lo que queda en el código es mejor que el comentario que se habría escrito sin el marcador: la razón tiene que nombrar la restricción, no repetir lo que hace el código. Y todas las excepciones vivas del repo se listan con un `grep -rn "no-comments:"`.
+
+El marcador marca el edit, no la línea: basta con que vaya en la primera línea del comentario, y así un comentario de varias líneas también pasa. A cambio, el prompt te enseña **todos** los comentarios que entran con ese edit, no solo los que llevan marcador, para que veas si se ha colado alguno de paso.
+
+El marcador escala a `ask` en cualquier modo de permiso. Está comprobado en sesión interactiva sobre los seis (`default`, `plan`, `acceptEdits`, `auto`, `dontAsk`, `bypassPermissions`): el `ask` de un hook se impone sobre la auto-aprobación del modo y el prompt aparece siempre, incluso en `bypassPermissions`. En headless (`claude -p`) no hay a quién preguntar y el edit se bloquea, que es el comportamiento correcto en CI.
 
 ## Excepciones por proyecto
 
