@@ -41,6 +41,23 @@
       ]
     },
     {
+      "name": "explain-pr",
+      "source": "./plugins/explain-pr",
+      "description": "Explica una pull request de GitHub a quien la va a revisar sin leer el código: un comentario Markdown listo para publicar con riesgo, diagramas, efectos secundarios, contraste con el ticket, decisiones sin aprobar, cobertura de tests y quién se entera si falla.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "category": "code-review",
+      "keywords": [
+        "pull-request",
+        "code-review",
+        "mermaid",
+        "agentic-development"
+      ],
+      "skills": [
+        "./skills/explain-pr"
+      ]
+    },
+    {
       "name": "no-comments-ruby",
       "source": "./plugins/no-comments-ruby",
       "description": "Hook PreToolUse que bloquea los comentarios nuevos en ficheros Ruby (.rb/.rake): el código se explica solo. Exime los pragmas de máquina (frozen_string_literal, sorbet, rubocop).",

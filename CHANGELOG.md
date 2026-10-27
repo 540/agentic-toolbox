@@ -11,6 +11,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Plugin `no-comments` (nuevo, 0.1.0): marcador `no-comments: <razón>` para la excepción puntual. Un comentario que lo lleva no se deniega: el hook devuelve `ask` y la decisión pasa por el sistema de permisos de Claude Code, en los modos que preguntan.
 - Plugin `no-comments` (nuevo, 0.1.0): configuración opcional por proyecto en `.no-comments.json`, con `ignore` (globs de rutas exentas) y `allow` (regex de comentarios permitidos).
 - Plugin `no-comments` (nuevo, 0.1.0): versión agnóstica al lenguaje del hook. Deduce la sintaxis de comentario de la extensión (familias `#`, `//`, `--`, `<!-- -->`) y deja pasar lo que no reconoce.
+- Plugin `explain-pr` (nuevo, 0.1.0): explica una PR a quien la va a revisar sin leer el código, como un comentario Markdown listo para publicar (riesgo, actores, diagramas, efectos secundarios, contraste con el ticket, decisiones sin aprobar, tests y señales en producción).
 
 ### Changed
 

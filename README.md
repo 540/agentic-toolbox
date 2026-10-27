@@ -22,6 +22,7 @@ npx skills add 540/agentic-toolbox
 | Skill | Qué hace |
 |-------|----------|
 | [gauntlet-audit](plugins/gauntlet-audit/) | Audita la red de verificación de un repo según el marco del gauntlet de [Uncle Bob](https://github.com/unclebob): 9 campos con madurez 0-4, score global y roadmap. Responde "¿puedo confiar en código escrito por agentes sin leerlo?". |
+| [explain-pr](plugins/explain-pr/) | Explica una PR a quien la va a revisar sin leer el código: un comentario listo para publicar en la PR con el riesgo, qué cambia para cada actor, diagramas Mermaid, efectos secundarios y si se pueden deshacer, contraste con el ticket, decisiones que nadie aprobó, si los tests lo prueban y quién se entera si falla. Nunca publica sin tu sí. |
 
 ## Hooks
 

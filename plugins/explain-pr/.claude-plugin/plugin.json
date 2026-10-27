@@ -1,0 +1,12 @@
+{
+  "name": "explain-pr",
+  "description": "Explica una pull request de GitHub a quien la va a revisar sin leer el código: un comentario Markdown listo para publicar con riesgo, diagramas, efectos secundarios, contraste con el ticket, decisiones sin aprobar, cobertura de tests y quién se entera si falla.",
+  "version": "0.1.0",
+  "author": {
+    "name": "540",
+    "url": "https://540deg.com"
+  },
+  "repository": "https://github.com/540/agentic-toolbox",
+  "license": "MIT",
+  "skills": ["./skills/explain-pr"]
+}
