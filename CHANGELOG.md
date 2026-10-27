@@ -6,6 +6,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-27
+
 ### Added
 
 - Plugin `no-comments` (nuevo, 0.1.0): marcador `no-comments: <razón>` para la excepción puntual. Un comentario que lo lleva no se deniega: el hook devuelve `ask` y la decisión pasa por el sistema de permisos de Claude Code, en los modos que preguntan.
@@ -16,6 +18,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 ### Changed
 
 - El plugin `no-comments` pasa a llamarse `no-comments-ruby`: su escáner siempre fue específico de Ruby y el nombre genérico queda libre para la versión agnóstica al lenguaje. Quien lo tuviera instalado debe reinstalarlo con el nombre nuevo.
+
+### Fixed
+
+- Marketplace: se quita `pluginRoot` de `marketplace.json` para que la CLI `skills` encuentre los plugins.
+- Skill `release`: se marca como interna para que la CLI `skills` no la ofrezca al instalar.
 
 ## [0.2.0] - 2026-09-01
 
@@ -31,6 +38,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Plugin `gauntlet-audit`: audita la red de verificación de un repo (9 campos con madurez 0-4, score global y roadmap) y responde "¿puedo confiar en código escrito por agentes sin leerlo?".
 - Estructura inicial del marketplace: `plugins/`, `resources/`, licencia MIT.
 
-[Unreleased]: https://github.com/540/agentic-toolbox/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/540/agentic-toolbox/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/540/agentic-toolbox/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/540/agentic-toolbox/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/540/agentic-toolbox/releases/tag/v0.1.0
